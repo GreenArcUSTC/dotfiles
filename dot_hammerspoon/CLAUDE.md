@@ -23,7 +23,7 @@ hs.application.frontmostApplication():bundleID()       -- frontmost app bundle I
 
 The entire config lives in `init.lua`. Current features:
 
-**Input method auto-switch** — watches `hs.window.filter.windowFocused` events. When a window is focused, a 0.1s deferred call switches to Chinese (WeType Pinyin) or English ABC based on a bundle ID allowlist (`chineseApps`). The delay prevents the OS/app from overriding the switch after Hammerspoon sets it.
+**Input method auto-switch** — watches `hs.application.watcher.activated` events. When an app is foregrounded, a 0.1s deferred call switches to Chinese (WeType Pinyin) or English ABC based on a bundle ID allowlist (`chineseApps`). The delay prevents the OS/app from overriding the switch after Hammerspoon sets it.
 
 Key constants:
 - `IM_CHINESE` — `com.tencent.inputmethod.wetype.pinyin`

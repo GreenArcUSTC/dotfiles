@@ -14,7 +14,7 @@ export PATH="/opt/homebrew/opt/llvm@13/bin:$PATH"
 # eval "$(pyenv init -)"
 # eval "$(pyenv virtualenv-init -)"
 
-# remove duplicate entries from $PATH
+# remove duplicat entries from $PATH
 # zsh uses $path array along with $PATH 
 typeset -U PATH path
 
@@ -24,9 +24,7 @@ export PATH="$HOME/.cargo/bin:$PATH"
 # Adds `~/.local/bin` to $PATH
 export PATH="$HOME/.local/bin:$PATH"
 
-if [ -n "$TVM_HOME" ]; then
-  export PYTHONPATH="$TVM_HOME/python:${PYTHONPATH}"
-fi
+# export PYTHONPATH=$TVM_HOME/python:${PYTHONPATH}
 
 # config for autojump, installed by homebrew
 [ -f /opt/homebrew/etc/profile.d/autojump.sh ] && . /opt/homebrew/etc/profile.d/autojump.sh

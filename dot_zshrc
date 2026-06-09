@@ -37,3 +37,17 @@ proxy_off() {
 
 # 如果想默认开启，就加这行：
 proxy_on
+
+# kimi-code
+export PATH="/Users/liwei/.kimi-code/bin:$PATH"
+
+
+# Homebrew USTC mirrors
+# export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.ustc.edu.cn/brew.git"
+# export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.ustc.edu.cn/homebrew-core.git"
+# export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.ustc.edu.cn/homebrew-bottles"
+# export HOMEBREW_API_DOMAIN="https://mirrors.ustc.edu.cn/homebrew-bottles/api"
+# export HOMEBREW_NO_ENV_HINTS="1"
+
+# Pi
+export PATH="/opt/homebrew/Cellar/node/26.0.0/bin:$PATH"
