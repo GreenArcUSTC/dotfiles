@@ -51,3 +51,12 @@ export PATH="/Users/liwei/.kimi-code/bin:$PATH"
 
 # Pi
 export PATH="/opt/homebrew/Cellar/node/26.0.0/bin:$PATH"
+
+# Terminal color compatibility: prefer readable output over automatic guessing.
+# Use a dark background everywhere; this matches the safest default assumed by
+# most terminal TUIs over SSH/tmux.
+export COLORTERM=truecolor
+export HERMES_TUI_THEME=dark
+export HERMES_TUI_BACKGROUND="#000000"
+export BAT_THEME=ansi
+export CLICOLOR=1
