@@ -8,9 +8,13 @@ Use [chezmoi](https://www.chezmoi.io/) to manage the dotfiles.
 * vim: minimal Vim config without plugins.
 * Hammerspoon: macOS automation, currently input method auto-switching.
 * tmux: geohot-style prefix and TPM plugins.
-* git: aliases, conditional work configs, Git LFS filter config, and `git lg`.
+* git: aliases, Git LFS filter config, global ignore, and `git lg`. User emails are intentionally kept out of this public repo.
 * pip: pip mirror config.
 * neovim: older Lua config kept for reference.
+* ghostty: terminal emulator settings.
+* karabiner: keyboard modifier mappings (Command/Option swap). Hardware identifiers (e.g., Bluetooth MAC addresses) are replaced with placeholders.
+* gh: GitHub CLI config and aliases.
+* podman/containers: engine proxy environment settings.
 
 Emacs is managed in a separate repository.
 

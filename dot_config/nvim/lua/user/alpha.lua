@@ -30,7 +30,7 @@ dashboard.section.buttons.val = {
   dashboard.button("qq", "*" .. " Quit", ":qa<CR>"),
 }
 local function footer()
-  return "stephen.lee.ustc@gmail.com"
+  return "your.email@example.com"
 end
 
 dashboard.section.footer.val = footer()

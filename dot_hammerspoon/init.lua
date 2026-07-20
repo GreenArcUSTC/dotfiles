@@ -6,7 +6,9 @@
 -- 【第一步】确认输入法 ID
 -- 切换到对应输入法后，在 Hammerspoon Console 执行以下命令查询：
 --   hs.keycodes.currentSourceID()
+
 local IM_CHINESE = "com.tencent.inputmethod.wetype.pinyin"  -- 微信输入法
+-- local IM_CHINESE = "com.bytedance.inputmethod.doubaoime.pinyin"  -- 豆包输入法
 local IM_ENGLISH = "com.apple.keylayout.ABC"            -- 系统英文 ABC
 
 -- 【第二步】填写需要中文输入法的 App
@@ -34,10 +36,27 @@ for _, id in ipairs(chineseApps) do
     chineseAppSet[id] = true
 end
 
+-- 切换提示样式：小号、半透明、屏幕底部，短暂显示，不打断操作
+local hintStyle = {
+    textSize = 13,
+    strokeWidth = 0,
+    strokeColor = { white = 0, alpha = 0 },
+    fillColor = { white = 0, alpha = 0.55 },
+    textColor = { white = 1, alpha = 0.85 },
+    radius = 8,
+    padding = 8,
+    atScreenEdge = 2, -- 屏幕底部
+    fadeInDuration = 0.1,
+    fadeOutDuration = 0.2,
+}
+
 local function switchInput(bundleID)
     local target = chineseAppSet[bundleID] and IM_CHINESE or IM_ENGLISH
     if hs.keycodes.currentSourceID() ~= target then
         hs.keycodes.currentSourceID(target)
+        local hint = (target == IM_CHINESE) and "中" or "EN"
+        hs.alert.closeAll(0)
+        hs.alert.show(hint, hintStyle, 0.5)
     end
 end
 

@@ -1,0 +1,18 @@
+# 字体大小，按你眼睛舒服改
+font-size = 14
+
+# 保持默认 TERM=xterm-ghostty，但 SSH 时自动兼容远程机器
+shell-integration = detect
+shell-integration-features = ssh-env,ssh-terminfo,path
+
+# tmux/ssh 更稳，不恢复一堆旧窗口
+window-save-state = never
+
+# 右键更接近普通 App 习惯
+right-click-action = context-menu
+
+
+term = xterm-256color
+
+# config for pi agent
+keybind = alt+backspace=text:\x1b\x7f

@@ -6,11 +6,9 @@
   lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 [user]
 	name = LI Wei
-	email = stephen.lee.ustc@gmail.com
-[includeIf "gitdir:/Users/liwei/Code/EZchain/"]
-    path = .gitconfig-ezchain
-[includeIf "gitdir:/Users/liwei/Code/weekly-report/"]
-    path = .gitconfig-work
+	# Email is intentionally omitted from this public dotfiles repo.
+	# Set it locally in ~/.gitconfig.local or via `git config --global user.email`.
+
 [init]
   defaultBranch = main
 [core]
