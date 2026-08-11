@@ -1,0 +1,18 @@
+[containers]
+
+
+[engine]
+{{- $port := 7890 }}
+{{- if hasKey . "containerProxyPort" }}{{ $port = .containerProxyPort }}{{ end }}
+env = [ "http_proxy=http://127.0.0.1:{{ $port }}", "https_proxy=http://127.0.0.1:{{ $port }}", "no_proxy=localhost,127.0.0.1,::1" ]
+
+[machine]
+
+
+[network]
+
+
+[secrets]
+
+
+[configmaps]

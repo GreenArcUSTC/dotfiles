@@ -1,0 +1,80 @@
+# zsh config based on oh-my-zsh
+
+export ZSH="$HOME/.oh-my-zsh"
+
+ZSH_THEME="ys"
+
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+
+source $ZSH/oh-my-zsh.sh
+
+# alias vim="nvim"
+# alias tvmc="python -m tvm.driver.tvmc"
+# pyenv shim workaround removed (migrated to uv on 2026-03-04)
+# alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
+
+# 只把真实存在的目录加进 PATH，缺失的工具不污染 PATH
+_prepend_path() { [ -d "$1" ] && export PATH="$1:$PATH" }
+
+_prepend_path "$HOME/.opencode/bin"          # opencode
+_prepend_path "$HOME/.kimi-code/bin"         # kimi-code
+_prepend_path "/opt/homebrew/opt/node/bin"   # pi 需要 brew 的 node；用 opt 软链，不写死版本号
+
+# for typora
+[ -d "/Applications/Typora.app" ] && alias typora="/Applications/Typora.app/Contents/MacOS/Typora"
+
+# 代理开关
+# 端口取自 ~/.config/chezmoi/chezmoi.toml 的 [data]，未配置时用通用默认值。
+PROXY_HTTP_PORT={{ if hasKey . "proxyHttpPort" }}{{ .proxyHttpPort }}{{ else }}7890{{ end }}
+PROXY_SOCKS_PORT={{ if hasKey . "proxySocksPort" }}{{ .proxySocksPort }}{{ else }}7891{{ end }}
+
+proxy_on() {
+  export http_proxy="http://127.0.0.1:${PROXY_HTTP_PORT}"
+  export https_proxy="$http_proxy"
+  export all_proxy="socks5://127.0.0.1:${PROXY_SOCKS_PORT}"
+  export no_proxy="localhost,127.0.0.1,::1"
+  echo "Proxy ON (${PROXY_HTTP_PORT}/${PROXY_SOCKS_PORT})"
+}
+
+proxy_off() {
+  unset http_proxy https_proxy all_proxy no_proxy
+  echo "Proxy OFF"
+}
+
+# 用 zsh 内置的 ztcp 探测，不依赖 nc，也不额外起进程
+_proxy_port_open() {
+  zmodload -F zsh/net/tcp b:ztcp 2>/dev/null || return 1
+  ztcp 127.0.0.1 "$1" 2>/dev/null || return 1
+  ztcp -c "$REPLY" 2>/dev/null
+  return 0
+}
+
+# 只在代理确实在监听时才自动开启。无条件开启会让没跑代理的机器上
+# git / curl / brew 全部连接被拒。
+if _proxy_port_open "$PROXY_HTTP_PORT"; then
+  proxy_on >/dev/null
+fi
+
+# Homebrew USTC mirrors
+# export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.ustc.edu.cn/brew.git"
+# export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.ustc.edu.cn/homebrew-core.git"
+# export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.ustc.edu.cn/homebrew-bottles"
+# export HOMEBREW_API_DOMAIN="https://mirrors.ustc.edu.cn/homebrew-bottles/api"
+# export HOMEBREW_NO_ENV_HINTS="1"
+
+# Terminal color compatibility: prefer readable output over automatic guessing.
+# Use a dark background everywhere; this matches the safest default assumed by
+# most terminal TUIs over SSH/tmux.
+export COLORTERM=truecolor
+export HERMES_TUI_THEME=dark
+export HERMES_TUI_BACKGROUND="#000000"
+export BAT_THEME=ansi
+export CLICOLOR=1
+
+# >>> otty shell integration >>>
+# Added by Otty — toggle in Settings > Shell > Shell Integration.
+# Inert unless launched by Otty (it sets $OTTY_SHELL_INTEGRATION).
+if [ -n "$OTTY_SHELL_INTEGRATION" ] && [ -r "$OTTY_SHELL_INTEGRATION/otty-integration.zsh" ]; then
+  . "$OTTY_SHELL_INTEGRATION/otty-integration.zsh"
+fi
+# <<< otty shell integration <<<

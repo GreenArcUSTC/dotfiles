@@ -21,9 +21,12 @@ hs.application.frontmostApplication():bundleID()       -- frontmost app bundle I
 
 ## Architecture
 
-The entire config lives in `init.lua`. Current features:
+The config is a chezmoi template: edit `init.lua.tmpl` in the dotfiles repo, not
+`~/.hammerspoon/init.lua`, which is generated output. Current features:
 
-**Input method auto-switch** — watches `hs.application.watcher.activated` events. When an app is foregrounded, a 0.1s deferred call switches to Chinese (WeType Pinyin) or English ABC based on a bundle ID allowlist (`chineseApps`). The delay prevents the OS/app from overriding the switch after Hammerspoon sets it.
+**Input method auto-switch** — subscribes to `hs.window.filter.windowFocused`. When a window is focused, a 0.1s deferred call switches to Chinese (WeType Pinyin) or English ABC based on a bundle ID allowlist (`chineseApps`). The delay prevents the OS/app from overriding the switch after Hammerspoon sets it; the callback re-checks that the frontmost app is still the same one before acting, so rapid window switching cannot apply a stale bundle ID.
+
+**Switch hint** — `showHint` draws a translucent capsule in the top-right corner via `hs.canvas` (`hs.alert` only supports center/top/bottom).
 
 Key constants:
 - `IM_CHINESE` — `com.tencent.inputmethod.wetype.pinyin`
@@ -32,7 +35,18 @@ Key constants:
 
 ## Adding a New App Rule
 
+The allowlist is not in this repo — it doubles as an inventory of installed
+software, so it lives in machine-local chezmoi data.
+
 1. Switch to the target app.
 2. In Console: `hs.application.frontmostApplication():bundleID()`
-3. Add the returned string to `chineseApps` (for Chinese) or leave it out (defaults to English).
-4. Reload config.
+3. Append the returned string to `~/.config/chezmoi/chezmoi.toml`:
+
+   ```toml
+   [[data.chineseApps]]
+     id = "com.example.App"
+     comment = "App"
+   ```
+
+   Apps left out of the list default to English.
+4. `chezmoi apply`, then Reload Config.

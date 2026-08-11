@@ -1,12 +1,20 @@
 export EDITOR=vim
 
-eval "$(/opt/homebrew/bin/brew shellenv)"
+# Homebrew：Apple Silicon 在 /opt/homebrew，Intel 在 /usr/local
+for _brew in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+  [ -x "$_brew" ] && eval "$("$_brew" shellenv)" && break
+done
+unset _brew
 
 # export JAVA_HOME=$(/usr/libexec/java_home)
 
 # export TVM_HOME="$HOME/Workspace/tvm"
 
-export PATH="/opt/homebrew/opt/llvm@13/bin:$PATH"
+# 只把真实存在的目录加进 PATH
+_prepend_path() { [ -d "$1" ] && export PATH="$1:$PATH" }
+_append_path()  { [ -d "$1" ] && export PATH="$PATH:$1" }
+
+_prepend_path "$(brew --prefix 2>/dev/null)/opt/llvm@13/bin"
 
 # pyenv disabled (migrated to uv on 2026-03-04)
 # export PYENV_ROOT="$HOME/.pyenv"
@@ -15,22 +23,24 @@ export PATH="/opt/homebrew/opt/llvm@13/bin:$PATH"
 # eval "$(pyenv virtualenv-init -)"
 
 # remove duplicat entries from $PATH
-# zsh uses $path array along with $PATH 
+# zsh uses $path array along with $PATH
 typeset -U PATH path
 
 # add cargo path to $PATH
-export PATH="$HOME/.cargo/bin:$PATH"
+_prepend_path "$HOME/.cargo/bin"
 
 # Adds `~/.local/bin` to $PATH
-export PATH="$HOME/.local/bin:$PATH"
+_prepend_path "$HOME/.local/bin"
 
 # export PYTHONPATH=$TVM_HOME/python:${PYTHONPATH}
 
 # config for autojump, installed by homebrew
-[ -f /opt/homebrew/etc/profile.d/autojump.sh ] && . /opt/homebrew/etc/profile.d/autojump.sh
+_autojump="$(brew --prefix 2>/dev/null)/etc/profile.d/autojump.sh"
+[ -f "$_autojump" ] && . "$_autojump"
+unset _autojump
 
 # Added by Obsidian
-export PATH="$PATH:/Applications/Obsidian.app/Contents/MacOS"
+_append_path "/Applications/Obsidian.app/Contents/MacOS"
 
 # uv defaults
 export UV_MANAGED_PYTHON=1
