@@ -55,7 +55,7 @@
                 },
                 {
                     "identifiers": {
-                        "device_address": "xx-xx-xx-xx-xx-xx",
+                        "device_address": "{{ if hasKey . "keyboardAddress" }}{{ .keyboardAddress }}{{ else }}xx-xx-xx-xx-xx-xx{{ end }}",
                         "is_keyboard": true
                     },
                     "simple_modifications": [

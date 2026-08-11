@@ -6,9 +6,18 @@
   lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 [user]
 	name = LI Wei
-	# Email is intentionally omitted from this public dotfiles repo.
-	# Set it locally in ~/.gitconfig.local or via `git config --global user.email`.
-
+{{- if hasKey . "email" }}
+	email = {{ .email }}
+{{- else }}
+	# Email 不入公开仓库：在 ~/.config/chezmoi/chezmoi.toml 的 [data] 里设 email，
+	# 或直接 `git config --global user.email`。
+{{- end }}
+{{- if hasKey . "gitIncludes" }}
+{{- range .gitIncludes }}
+[includeIf "gitdir:{{ .gitdir }}"]
+    path = {{ .path }}
+{{- end }}
+{{- end }}
 [init]
   defaultBranch = main
 [core]

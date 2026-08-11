@@ -30,7 +30,7 @@ dashboard.section.buttons.val = {
   dashboard.button("qq", "*" .. " Quit", ":qa<CR>"),
 }
 local function footer()
-  return "your.email@example.com"
+  return "{{ if hasKey . "email" }}{{ .email }}{{ else }}your.email@example.com{{ end }}"
 end
 
 dashboard.section.footer.val = footer()

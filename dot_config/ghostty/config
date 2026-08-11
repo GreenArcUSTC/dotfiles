@@ -1,3 +1,9 @@
+# 主字体：JetBrains Mono（编程连字，终端显示清晰）
+font-family = "JetBrains Mono"
+
+# 中文回退字体：MiSans（主字体缺少的中文字形自动用它渲染）
+font-family = "MiSans"
+
 # 字体大小，按你眼睛舒服改
 font-size = 14
 
@@ -10,9 +16,6 @@ window-save-state = never
 
 # 右键更接近普通 App 习惯
 right-click-action = context-menu
-
-
-term = xterm-256color
 
 # config for pi agent
 keybind = alt+backspace=text:\x1b\x7f

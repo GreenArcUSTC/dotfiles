@@ -23,7 +23,16 @@ local chineseApps = {
     "com.apple.Notes",          -- 备忘录
     "com.apple.mail",           -- 邮件
     "md.obsidian",              -- Obsidian
-    "com.notion.id",            -- Notion
+    "com.electron.lark",        -- 飞书 Lark
+    "com.tencent.meeting",      -- 腾讯会议
+    "com.baidu.netdisk",        -- 百度网盘
+    "com.hnc.Discord",          -- Discord
+    "com.microsoft.onenote.mac", -- OneNote
+    "com.microsoft.to-do-mac",  -- Microsoft To Do
+    "net.cozic.joplin-desktop", -- Joplin
+    "abnerworks.Typora",        -- Typora
+    "org.xmind.cathy.application", -- XMind
+    "com.microsoft.Word",       -- Word
     -- 继续添加 ↑
 }
 
@@ -36,27 +45,50 @@ for _, id in ipairs(chineseApps) do
     chineseAppSet[id] = true
 end
 
--- 切换提示样式：小号、半透明、屏幕底部，短暂显示，不打断操作
-local hintStyle = {
-    textSize = 13,
-    strokeWidth = 0,
-    strokeColor = { white = 0, alpha = 0 },
-    fillColor = { white = 0, alpha = 0.55 },
-    textColor = { white = 1, alpha = 0.85 },
-    radius = 8,
-    padding = 8,
-    atScreenEdge = 2, -- 屏幕底部
-    fadeInDuration = 0.1,
-    fadeOutDuration = 0.2,
-}
+-- 切换提示：屏幕右上角的半透明小胶囊，短暂显示，不打断操作
+-- （hs.alert 只支持居中/顶/底，右上角需用 hs.canvas 自绘）
+local hintCanvas = nil
+local hintTimer = nil
+
+local function showHint(text)
+    if hintTimer then hintTimer:stop(); hintTimer = nil end
+    if hintCanvas then hintCanvas:delete(); hintCanvas = nil end
+
+    local screenFrame = hs.screen.mainScreen():frame()
+    local w, h = 44, 26
+    hintCanvas = hs.canvas.new({
+        x = screenFrame.x + screenFrame.w - w - 12,
+        y = screenFrame.y + 12,
+        w = w,
+        h = h,
+    })
+    hintCanvas[1] = {
+        type = "rectangle",
+        action = "fill",
+        fillColor = { white = 0, alpha = 0.55 },
+        roundedRectRadii = { xRadius = h / 2, yRadius = h / 2 },
+    }
+    hintCanvas[2] = {
+        type = "text",
+        text = text,
+        textSize = 13,
+        textColor = { white = 1, alpha = 0.85 },
+        textAlignment = "center",
+        frame = { x = 0, y = (h - 18) / 2, w = w, h = 18 },
+    }
+    hintCanvas:level(hs.canvas.windowLevels.overlay)
+    hintCanvas:show()
+    hintTimer = hs.timer.doAfter(0.6, function()
+        if hintCanvas then hintCanvas:delete(0.2); hintCanvas = nil end
+        hintTimer = nil
+    end)
+end
 
 local function switchInput(bundleID)
     local target = chineseAppSet[bundleID] and IM_CHINESE or IM_ENGLISH
     if hs.keycodes.currentSourceID() ~= target then
         hs.keycodes.currentSourceID(target)
-        local hint = (target == IM_CHINESE) and "中" or "EN"
-        hs.alert.closeAll(0)
-        hs.alert.show(hint, hintStyle, 0.5)
+        showHint(target == IM_CHINESE and "中" or "EN")
     end
 end
 
@@ -67,7 +99,12 @@ windowFilter:subscribe(hs.window.filter.windowFocused, function(win)
     if not app then return end
     local bid = app:bundleID()
     if not bid then return end
-    hs.timer.doAfter(0.1, function() switchInput(bid) end)
+    -- 延时 0.1s 再切换，避免被系统/App 自身的输入法行为覆盖；
+    -- 触发时校验前台 App 未变，防止快速连续切窗口时按过期 bundleID 切换
+    hs.timer.doAfter(0.1, function()
+        local front = hs.application.frontmostApplication()
+        if front and front:bundleID() == bid then switchInput(bid) end
+    end)
 end)
 
 local front = hs.application.frontmostApplication()
