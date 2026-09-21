@@ -80,8 +80,11 @@ end
 local function switchInput(bundleID)
     local target = chineseAppSet[bundleID] and IM_CHINESE or IM_ENGLISH
     if hs.keycodes.currentSourceID() ~= target then
-        hs.keycodes.currentSourceID(target)
-        showHint(target == IM_CHINESE and "中" or "EN")
+        if hs.keycodes.currentSourceID(target) then
+            showHint(target == IM_CHINESE and "中" or "EN")
+        else
+            print("[inputSwitcher] 输入法切换失败，目标输入源：" .. target)
+        end
     end
 end
 

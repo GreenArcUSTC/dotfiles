@@ -11,10 +11,10 @@ Use [chezmoi](https://www.chezmoi.io/) to manage the dotfiles.
 * git: aliases, Git LFS filter config, global ignore, and `git lg`. Email and per-directory identity overrides come from local template data, not this repo.
 * pip: pip mirror config.
 * neovim: older Lua config kept for reference.
-* ghostty: terminal emulator settings (JetBrains Mono with MiSans CJK fallback).
+* ghostty: Solarized Light (custom palette matching iTerm2), JetBrains Mono with MiSans CJK fallback, and iTerm2-aligned cursor/scrollback/Option-as-Alt settings.
 * karabiner: keyboard modifier mappings (Command/Option swap). Bluetooth MAC addresses come from local template data.
 * gh: GitHub CLI config and aliases.
-* herdr: terminal multiplexer/agent workspace config, kept as the annotated upstream default with only `onboarding` and `pane_history` set.
+* herdr: terminal multiplexer/agent workspace config, based on the annotated upstream default. Active overrides: `onboarding = false`, `pane_history = false`, `theme.auto_switch = false`, toast `delivery = "terminal"`.
 * podman/containers: engine proxy environment settings; the port comes from local template data.
 
 Emacs is managed in a separate repository.

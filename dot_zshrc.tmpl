@@ -19,6 +19,7 @@ _prepend_path() { [ -d "$1" ] && export PATH="$1:$PATH" }
 _prepend_path "$HOME/.opencode/bin"          # opencode
 _prepend_path "$HOME/.kimi-code/bin"         # kimi-code
 _prepend_path "/opt/homebrew/opt/node/bin"   # pi 需要 brew 的 node；用 opt 软链，不写死版本号
+_prepend_path "/opt/homebrew/opt/ffmpeg-full/bin"  # 带 libass/freetype 的完整版；精简版 ffmpeg 没有 ass/subtitles/drawtext 滤镜
 
 # for typora
 [ -d "/Applications/Typora.app" ] && alias typora="/Applications/Typora.app/Contents/MacOS/Typora"
@@ -62,19 +63,9 @@ fi
 # export HOMEBREW_API_DOMAIN="https://mirrors.ustc.edu.cn/homebrew-bottles/api"
 # export HOMEBREW_NO_ENV_HINTS="1"
 
-# Terminal color compatibility: prefer readable output over automatic guessing.
-# Use a dark background everywhere; this matches the safest default assumed by
-# most terminal TUIs over SSH/tmux.
-export COLORTERM=truecolor
-export HERMES_TUI_THEME=dark
-export HERMES_TUI_BACKGROUND="#000000"
-export BAT_THEME=ansi
-export CLICOLOR=1
 
-# >>> otty shell integration >>>
-# Added by Otty — toggle in Settings > Shell > Shell Integration.
-# Inert unless launched by Otty (it sets $OTTY_SHELL_INTEGRATION).
-if [ -n "$OTTY_SHELL_INTEGRATION" ] && [ -r "$OTTY_SHELL_INTEGRATION/otty-integration.zsh" ]; then
-  . "$OTTY_SHELL_INTEGRATION/otty-integration.zsh"
-fi
-# <<< otty shell integration <<<
+# >>> grok installer >>>
+export PATH="$HOME/.grok/bin:$PATH"
+fpath=(~/.grok/completions/zsh $fpath)
+autoload -Uz compinit && compinit -C
+# <<< grok installer <<<
