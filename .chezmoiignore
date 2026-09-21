@@ -3,6 +3,3 @@ data
 doc
 assets
 README.md
-
-# packer 启动时自动生成，内容里写死了本机绝对路径，不入库
-.config/nvim/plugin/packer_compiled.lua
