@@ -1,37 +1,76 @@
-# zsh config based on oh-my-zsh
+# Native zsh config
 
-export ZSH="$HOME/.oh-my-zsh"
+typeset -U PATH path fpath
 
-ZSH_THEME="ys"
+# 只把真实存在的目录加进 PATH，缺失的工具不污染 PATH。
+_prepend_path() { [[ -d $1 ]] && path=("$1" $path) }
 
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+_prepend_path "$HOME/.opencode/bin"           # opencode
+_prepend_path "$HOME/.kimi-code/bin"          # kimi-code
+_prepend_path "$HOME/.grok/bin"               # grok
+_prepend_path "/opt/homebrew/opt/node/bin"        # pi 需要 brew 的 node
+_prepend_path "/opt/homebrew/opt/ffmpeg-full/bin" # 完整版包含 ass/subtitles/drawtext 滤镜
 
-# 在 Oh My Zsh 初始化补全前注册 Grok，统一使用其补全缓存。
-if [ -d "$HOME/.grok/completions/zsh" ]; then
-  fpath=("$HOME/.grok/completions/zsh" $fpath)
-fi
+# History
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=10000
+setopt EXTENDED_HISTORY HIST_EXPIRE_DUPS_FIRST HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE HIST_VERIFY SHARE_HISTORY
 
-source $ZSH/oh-my-zsh.sh
+# Directories and interaction
+setopt AUTO_CD AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHDMINUS
+setopt INTERACTIVE_COMMENTS MULTIOS LONG_LIST_JOBS
+bindkey -e
 
-# alias vim="nvim"
-# alias tvmc="python -m tvm.driver.tvmc"
-# pyenv shim workaround removed (migrated to uv on 2026-03-04)
-# alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
+alias ls='ls -G'
+alias ll='ls -lh'
+alias la='ls -lAh'
+alias l='ls -lah'
+alias grep='grep --color=auto'
 
-# 只把真实存在的目录加进 PATH，缺失的工具不污染 PATH
-_prepend_path() { [ -d "$1" ] && export PATH="$1:$PATH" }
+# Git shortcuts; git co/ci/br/st/lg remain in .gitconfig.
+alias g='git'
+alias ga='git add'
+alias gcmsg='git commit --message'
+alias gp='git push'
+alias gl='git pull'
+alias gd='git diff'
+alias gst='git status'
+alias gco='git checkout'
+alias gcb='git checkout -b'
 
-_prepend_path "$HOME/.opencode/bin"          # opencode
-_prepend_path "$HOME/.kimi-code/bin"         # kimi-code
-_prepend_path "$HOME/.grok/bin"              # grok
-_prepend_path "/opt/homebrew/opt/node/bin"   # pi 需要 brew 的 node；用 opt 软链，不写死版本号
-_prepend_path "/opt/homebrew/opt/ffmpeg-full/bin"  # 带 libass/freetype 的完整版；精简版 ffmpeg 没有 ass/subtitles/drawtext 滤镜
+# Minimal synchronous ys-style prompt.
+setopt PROMPT_SUBST
+_ys_precmd() {
+  local last_status=$? branch
+  _ys_exit_prompt=''
+  (( last_status )) && _ys_exit_prompt="C:%F{red}${last_status}%f"
+  _ys_venv_prompt=''
+  [[ -n ${VIRTUAL_ENV:-} ]] && _ys_venv_prompt=" %F{green}${VIRTUAL_ENV:t}%f"
+
+  _ys_git_prompt=''
+  branch="$(GIT_OPTIONAL_LOCKS=0 command git symbolic-ref --quiet --short HEAD 2>/dev/null)" ||
+    branch="$(GIT_OPTIONAL_LOCKS=0 command git rev-parse --short HEAD 2>/dev/null)" || return 0
+  _ys_git_prompt=" %fon%F{blue} git:%F{cyan}${branch//\%/%%}"
+  if [[ -n "$(GIT_OPTIONAL_LOCKS=0 command git status --porcelain --ignore-submodules=dirty 2>/dev/null)" ]]; then
+    _ys_git_prompt+=" %F{red}x%f"
+  else
+    _ys_git_prompt+=" %F{green}o%f"
+  fi
+}
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd _ys_precmd
+
+PROMPT="
+%F{blue}#%f %F{cyan}%n%f @ %F{green}%m%f in %B%F{yellow}%~%f%b\
+\${_ys_git_prompt}\${_ys_venv_prompt} [%*] \${_ys_exit_prompt}
+%B%F{red}$ %f%b"
 
 # for typora
-[ -d "/Applications/Typora.app" ] && alias typora="/Applications/Typora.app/Contents/MacOS/Typora"
+[[ -d /Applications/Typora.app ]] && alias typora='/Applications/Typora.app/Contents/MacOS/Typora'
 
-# 代理开关
-# 端口取自 ~/.config/chezmoi/chezmoi.toml 的 [data]，未配置时用通用默认值。
+# 代理开关。端口来自本地 chezmoi data，未配置时使用通用默认值。
 PROXY_HTTP_PORT={{ if hasKey . "proxyHttpPort" }}{{ .proxyHttpPort }}{{ else }}7890{{ end }}
 PROXY_SOCKS_PORT={{ if hasKey . "proxySocksPort" }}{{ .proxySocksPort }}{{ else }}7891{{ end }}
 
@@ -48,7 +87,7 @@ proxy_off() {
   echo "Proxy OFF"
 }
 
-# 用 zsh 内置的 ztcp 探测，不依赖 nc，也不额外起进程
+# 用 zsh 内置的 ztcp 探测，不依赖 nc，也不额外起进程。
 _proxy_port_open() {
   zmodload -F zsh/net/tcp b:ztcp 2>/dev/null || return 1
   ztcp 127.0.0.1 "$1" 2>/dev/null || return 1
@@ -56,11 +95,11 @@ _proxy_port_open() {
   return 0
 }
 
-# 只在代理确实在监听时才自动开启。无条件开启会让没跑代理的机器上
-# git / curl / brew 全部连接被拒。
-if _proxy_port_open "$PROXY_HTTP_PORT"; then
-  proxy_on >/dev/null
-fi
+# 只在代理确实监听时自动开启，避免 git/curl/brew 连接被拒。
+_proxy_port_open "$PROXY_HTTP_PORT" && proxy_on >/dev/null
+
+# my own aj-rs
+command -v autojump >/dev/null 2>&1 && eval "$(autojump --init zsh)"
 
 # Homebrew USTC mirrors
 # export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.ustc.edu.cn/brew.git"

@@ -35,9 +35,10 @@ _prepend_path "$HOME/.local/bin"
 # export PYTHONPATH=$TVM_HOME/python:${PYTHONPATH}
 
 # config for autojump, installed by homebrew
-_autojump="$(brew --prefix 2>/dev/null)/etc/profile.d/autojump.sh"
-[ -f "$_autojump" ] && . "$_autojump"
-unset _autojump
+# _autojump="$(brew --prefix 2>/dev/null)/etc/profile.d/autojump.sh"
+# [ -f "$_autojump" ] && . "$_autojump"
+# unset _autojump
+# aj-rs is initialized in .zshrc instead.
 
 # Added by Obsidian
 _append_path "/Applications/Obsidian.app/Contents/MacOS"

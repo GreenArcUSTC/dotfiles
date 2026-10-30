@@ -4,7 +4,7 @@ Use [chezmoi](https://www.chezmoi.io/) to manage the dotfiles.
 
 ## Contents
 
-* zsh: oh-my-zsh based shell config, `proxy_on`/`proxy_off` helpers, Homebrew setup, and uv-first Python defaults. Proxy ports come from local template data; the proxy auto-enables only when the port is actually listening.
+* zsh: minimal native shell config with a two-line ys-style prompt, aj-rs, `proxy_on`/`proxy_off` helpers, and uv-first Python defaults. No oh-my-zsh, prompt plugins, or completion setup. Proxy ports come from local template data; the proxy auto-enables only when the port is actually listening.
 * vim: minimal Vim config without plugins.
 * Hammerspoon: macOS automation, currently input method auto-switching with an on-screen hint. The app allowlist comes from local template data.
 * tmux: default `C-b` prefix, RGB/extended-keys terminal setup, mouse on, 1-based indexing. No plugin manager.
@@ -69,9 +69,9 @@ Nothing here hardcodes a username or a machine path. Specifically:
 * Every `PATH` entry is added only if the directory exists, so missing tools do
   not pollute `PATH`.
 * Homebrew is located at `/opt/homebrew` or `/usr/local`, whichever exists.
-* The node path uses Homebrew's version-independent `opt/node` symlink.
-* Grok's completion directory is registered before Oh My Zsh initializes
-  completion, sharing its cache instead of running `compinit` a second time.
+* The node and ffmpeg paths use Homebrew's version-independent
+  `/opt/homebrew/opt` symlinks.
+* aj-rs initializes in `.zshrc` instead of sourcing `autojump.sh` in `.zprofile`.
 * The proxy turns on only when something is listening on the configured port.
   Enabling it unconditionally breaks `git`, `curl`, and `brew` on machines with
   no proxy running.
